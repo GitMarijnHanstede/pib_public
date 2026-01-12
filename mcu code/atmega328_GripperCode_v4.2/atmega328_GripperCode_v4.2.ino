@@ -19,24 +19,24 @@ const int O_ERROR = 5;                      //
 //////////////////////////////////////////////
 
 ////////////////sensor value//////////////////
-//expected value small 163                  //
-const int value_Small_max = 180;            //
-const int value_Small_min = 141;            //
+//expected value small 33                  //
+const int value_Small_max = 170;            //
+const int value_Small_min = 95;            //
                                             //
-//expected value small 133                  //
-const int value_Medium_max = 140;           //
-const int value_Medium_min = 106;           //
+//expected value medium 69                  //
+const int value_Medium_max = 94;           //
+const int value_Medium_min = 61;           //
                                             //
-//expected value small  97                  //
-const int value_Big_max = 105;              //
+//expected value small  103                  //
+const int value_Big_max = 60;              //
                               //97          //
-const int value_Big_min = 0;                //
+const int value_Big_min = 25;                //
 //////////////////////////////////////////////
 
 int valueFSR = 50000; // initinalsing fsr to prevent problems with visualization of force
 bool Flag = LOW;      // FLag to avoid duplicate execution
 
-const int drempel[] = { 1024, 992, 960, 928, 896, 864, 832, 800,};
+const int drempel[] = { 1024, 992, 800, 700, 600, 400, 300, 200,};
 
 enum State { IDLE, CLOSE, OPEN, ESTOP };
 State currentState = IDLE;
@@ -141,10 +141,12 @@ void loop() {
           }                                                               //  //
           else {                                                          //  //
             Serial.println("OUTPUT → ERROR");                             //  //
-          // digitalWrite(O_BIT1, LOW);                                   //  //
-            //digitalWrite(O_BIT2, LOW);                                  //  //
-            //digitalWrite(O_CONFIRM, LOW);                               //  //
-            //digitalWrite(O_ERROR, HIGH);                                //  //
+           digitalWrite(O_BIT1, LOW);                                   //  //
+            digitalWrite(O_BIT2, LOW);                //  //
+            digitalWrite(O_CONFIRM, LOW);                               //  //
+            digitalWrite(O_ERROR, HIGH);  
+            delay (100); 
+            digitalWrite(O_ERROR, LOW);                               //  //
           }                                                               //  //
 ////////////////////////////////////////////////////////////////////////////  //
           currentState = IDLE;      // reset to IDLE                          //
@@ -187,17 +189,14 @@ void moveServo(int position) {
 }
 // Function that converts the force value into a byte and sends it to the I2C device at address 0x20
 void display_force(int force_int) {
-  byte output_byte = B11111111;
- 
+  byte output_byte = B00000000;
+                     
  // If the force is greater than or equal to drempel[i],
-  for (int i = 0; i < 8; i++) {// Loop through all 8 threshold values
-    if (force_int >= drempel[i]) {
-      output_byte &= ~(1 << i);
-      //Create a mask: (1 << i)
-      //Invert the mask ~(1 << i)
-      //Apply mask with Bitwise AND
+    for (int i = 0; i < 8; i++) {
+        if (force_int >= drempel[i]) {
+            output_byte |= (1 << i);   // bit aan
+        }
     }
-  }
 // send output byte
   Wire.beginTransmission(0x20);
   Wire.write(output_byte);

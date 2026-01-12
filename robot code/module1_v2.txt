@@ -1,0 +1,267 @@
+MODULE Module1
+    !CONST signaldi Di5 := D652_10_DI4;
+    CONST jointtarget pHome:=[[0,1.183292708,7.657727206,0,10.122909817,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget Bal1:=[[271.47,277.86,23.02],[2.14589E-05,-0.707107,-0.707106,7.83351E-05],[-1,-1,-1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget Small:=[[720.32,277.86,23.02],[2.02713E-05,-0.707101,-0.707113,-5.19189E-06],[0,-1,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget Medium:=[[869.28,277.86,23.02],[0.00011612,-0.707115,-0.707098,-2.42959E-06],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget Large:=[[1016.81,277.86,23.02],[1.30453E-05,0.707148,0.707066,-2.34607E-05],[0,-1,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget Bal3:=[[569.62,277.86,23.02],[4.36497E-05,-0.707093,-0.707121,-9.07366E-05],[-1,0,-1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget Bal2:=[[423.25,277.86,23.02],[1.80277E-05,-0.70712,-0.707093,-6.30353E-05],[-1,-1,-1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    VAR num GlobalSize:=0;
+    VAR num restart:=0;
+    VAR num error_int:=0;
+    VAR speeddata snelheid:=[100,50,500,100];
+    VAR bool erroroptions:=FALSE;
+    VAR num void:=0;
+    !VAR sneheid := [1000,500,5000,1000];
+    !VAR sneheid := [500,250,2500,1000];
+    !VAR sneheid := [100,50,500,100];
+    VAR bool isSmallFilled:=FALSE;
+    VAR bool isMediumFilled:=FALSE;
+    VAR bool isLargeFilled:=FALSE;
+    VAR string ErrorMsg:="";
+    VAR bool doorgaan:=FALSE;
+
+    PROC main()
+        IDelete error_int;
+        !proc maken
+        CONNECT error_int WITH StopOnBit4;
+        ISignalDI D652_10_DI4,1,error_int;
+        Home;
+        isSmallFilled:=FALSE;
+        isMediumFilled:=FALSE;
+        isLargeFilled:=FALSE;
+        TPReadFK void,"wachten op start","start",stEmpty,stEmpty,stEmpty,stEmpty;
+        path_bal1;
+        Path_Sort;
+        path_bal2;
+        Path_Sort;
+        path_bal3;
+        Path_Sort;
+        Home;
+
+    ENDPROC
+
+    TRAP StopOnBit4
+        Define_error;
+        ERROR_handling;
+
+    ENDTRAP
+
+    !handshake FUNC met return
+    !bal centerpoint weizigen naar klleine bal
+
+
+
+    PROC Home()
+        MoveAbsJ pHome,snelheid,z100,gripper_V4\WObj:=Workobject_1;
+    ENDPROC
+
+    PROC path_bal1()
+        MoveL Offs(Bal1,0,0,100),snelheid,z0,gripper_V4\WObj:=Workobject_1;
+        MoveL Bal1,snelheid,fine,gripper_V4\WObj:=Workobject_1;
+        WaitRob\InPos;
+        path_CLOSE;
+        MoveL Offs(Bal1,0,0,100),snelheid,z0,gripper_V4\WObj:=Workobject_1;
+    ENDPROC
+
+    PROC path_bal2()
+        MoveL Offs(Bal2,0,0,100),snelheid,z0,gripper_V4\WObj:=Workobject_1;
+        MoveL Bal2,snelheid,fine,gripper_V4\WObj:=Workobject_1;
+        WaitRob\InPos;
+        path_CLOSE;
+        MoveL Offs(Bal2,0,0,100),snelheid,z0,gripper_V4\WObj:=Workobject_1;
+    ENDPROC
+
+    PROC path_bal3()
+        MoveL Offs(Bal3,0,0,100),snelheid,z0,gripper_V4\WObj:=Workobject_1;
+        MoveL Bal3,snelheid,fine,gripper_V4\WObj:=Workobject_1;
+        WaitRob\InPos;
+        path_CLOSE;
+        MoveL Offs(Bal3,0,0,100),snelheid,z0,gripper_V4\WObj:=Workobject_1;
+    ENDPROC
+
+    PROC path_Small()
+        MoveL Offs(Small,0,0,100),snelheid,z0,gripper_V4\WObj:=Workobject_1;
+        MoveL Small,snelheid,fine,gripper_V4\WObj:=Workobject_1;
+        WaitRob\InPos;
+        path_OPEN;
+        MoveL Offs(Small,0,0,100),snelheid,z0,gripper_V4\WObj:=Workobject_1;
+    ENDPROC
+
+    PROC path_Medium()
+        MoveL Offs(Medium,0,0,100),snelheid,z0,gripper_V4\WObj:=Workobject_1;
+        MoveL Medium,snelheid,fine,gripper_V4\WObj:=Workobject_1;
+        WaitRob\InPos;
+        path_OPEN;
+        MoveL Offs(Medium,0,0,100),snelheid,z0,gripper_V4\WObj:=Workobject_1;
+    ENDPROC
+
+    PROC path_Large()
+        MoveL Offs(Large,0,0,100),snelheid,z0,gripper_V4\WObj:=Workobject_1;
+        MoveL Large,snelheid,fine,gripper_V4\WObj:=Workobject_1;
+        WaitRob\InPos;
+        path_OPEN;
+        MoveL Offs(Large,0,0,100),snelheid,z0,gripper_V4\WObj:=Workobject_1;
+    ENDPROC
+
+    PROC path_OPEN()
+        SetDO D652_10_DO8,high;
+        WaitUntil(D652_10_DI3=1) OR (doorgaan=TRUE);
+        doorgaan:=FALSE;
+        SetDO D652_10_DO8,low;
+    ENDPROC
+
+    PROC path_CLOSE()
+        SetDO D652_10_DO7,high;
+        WaitUntil(D652_10_DI3=1) OR (doorgaan=TRUE);
+        DefineSize;
+        doorgaan:=FALSE;
+        SetDO D652_10_DO7,low;
+    ENDPROC
+
+
+
+    PROC Path_Sort()
+        TEST GlobalSize
+        CASE 1:
+            GlobalSize:=0;
+            path_Small;
+        CASE 2:
+            GlobalSize:=0;
+            path_Medium;
+        CASE 3:
+            GlobalSize:=0;
+            path_Large;
+        DEFAULT:
+            path_OPEN;
+            GlobalSize:=0;
+        ENDTEST
+
+    ENDPROC
+
+    PROC DefineSize()
+        VAR num bit0;
+        VAR num bit1;
+        IF GlobalSize=5 THEN
+        ELSE
+
+
+
+            bit0:=D652_10_DI1;
+            bit1:=D652_10_DI2;
+
+            IF bit1=0 AND bit0=0 THEN
+                GlobalSize:=1;
+                ! Small
+            ELSEIF bit1=0 AND bit0=1 THEN
+                GlobalSize:=2;
+                ! Medium
+            ELSEIF bit1=1 AND bit0=0 THEN
+                GlobalSize:=3;
+                ! Large
+            ELSEIF bit1=1 AND bit0=1 THEN
+                GlobalSize:=4;
+                ! Open
+            ENDIF
+            ! ---------- BEZET-CONTROLE ----------
+
+            IF isSmallFilled=TRUE AND GlobalSize=1 THEN
+                ErrorMsg:="Small positie is al bezet";
+                ERROR_handling;
+
+            ELSEIF isMediumFilled=TRUE AND GlobalSize=2 THEN
+                ErrorMsg:="Medium positie is al bezet";
+                ERROR_handling;
+
+            ELSEIF isLargeFilled=TRUE AND GlobalSize=3 THEN
+                ErrorMsg:="Large positie is al bezet";
+                ERROR_handling;
+            ENDIF
+
+            ! ---------- POSITIE NU MARKEREN ALS GEVULD ----------
+
+            IF GlobalSize=1 THEN
+                isSmallFilled:=TRUE;
+            ELSEIF GlobalSize=2 THEN
+                isMediumFilled:=TRUE;
+            ELSEIF GlobalSize=3 THEN
+                isLargeFilled:=TRUE;
+            ENDIF
+        ENDIF
+    ENDPROC
+
+    PROC Define_error()
+        VAR num bit0;
+        VAR num bit1;
+
+        bit0:=D652_10_DI1;
+        bit1:=D652_10_DI2;
+
+        IF bit1=0 AND bit0=0 THEN
+            ErrorMsg:="ball not found or out of range";
+            ! Small
+            GlobalSize:=5;
+        ELSEIF bit1=0 AND bit0=1 THEN
+            ErrorMsg:="ball lost";
+            ! Medium
+        ELSEIF bit1=1 AND bit0=0 THEN
+            ErrorMsg:="tool error";
+            ! Large
+        ELSEIF bit1=1 AND bit0=1 THEN
+            ErrorMsg:="tool error";
+            ! Open
+        ENDIF
+    ENDPROC
+
+
+    PROC ERROR_handling()
+        StopMove;
+        ! stopt huidige beweging en leegt motion queue
+        IDisable;
+        erroroptions:=TRUE;
+        ! interrupt tijdelijk uit
+        TPErase;
+
+        TPWrite ErrorMsg;
+
+        WHILE erroroptions DO
+            ! Hier vragen we de gebruiker wat te doen
+            TPReadFK restart,
+        "SYSTEEM ONDERBROKEN: Handmatige actie vereist.",
+        "Grijper OPEN",
+        "Grijper DICHT",
+        stEmpty,
+        "Doorgaan",
+        "Herstart";
+            TPWrite "als je wilt herstaren verwijder zorg ervoor dat de gripper open staat";
+            TEST restart
+            CASE 1:
+                SetDO D652_10_DO7,low;
+                SetDO D652_10_DO8,low;
+                Waittime 1;
+                path_OPEN;
+            CASE 2:
+                SetDO D652_10_DO7,low;
+                SetDO D652_10_DO8,low;
+                Waittime 1;
+                path_close;
+            CASE 4:
+                ! doorgaan
+                IEnable;
+                ! interrupts weer aan
+                doorgaan:=TRUE;
+                StartMove;
+                erroroptions:=FALSE;
+            DEFAULT:
+                IEnable;
+                TPWrite "Robot gaat naar HOME";
+                StorePath;
+                Home;
+                WaitRob\InPos;
+                ExitCycle;
+                erroroptions:=FALSE;
+            ENDTEST
+        ENDWHILE
+    ENDPROC
+ENDMODULE
