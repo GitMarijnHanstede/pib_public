@@ -107,14 +107,14 @@ MODULE Module1
 
     PROC path_OPEN()
         SetDO D652_10_DO8,high;
-        WaitUntil(D652_10_DI3=1) OR (doorgaan=TRUE);
+         WaitUntil(D652_10_DI3=1) OR (doorgaan=TRUE) OR (D652_10_DI4 =1);
         doorgaan:=FALSE;
         SetDO D652_10_DO8,low;
     ENDPROC
 
     PROC path_CLOSE()
         SetDO D652_10_DO7,high;
-        WaitUntil(D652_10_DI3=1) OR (doorgaan=TRUE);
+        WaitUntil(D652_10_DI3=1) OR (doorgaan=TRUE) OR (D652_10_DI4 =1);
         DefineSize;
         doorgaan:=FALSE;
         SetDO D652_10_DO7,low;
